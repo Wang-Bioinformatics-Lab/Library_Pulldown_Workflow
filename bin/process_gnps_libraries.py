@@ -2,6 +2,7 @@ import sys
 import argparse
 import pandas as pd
 import requests
+import random
 
 def get_gnps_library_entries(library_name):
     url = "https://gnps.ucsd.edu/ProteoSAFe/LibraryServlet?library={}".format(library_name)
@@ -31,6 +32,11 @@ def main():
     args = parser.parse_args()
 
     all_gnps_libraries = get_all_gnps_libraries()
+    
+    # shuffle order
+    shuffled = random.shuffle(all_gnps_libraries)
+    
+
 
     library_entries = []
 
