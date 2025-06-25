@@ -23,10 +23,6 @@ else{
 // Augmenting with nf_output
 _publishdir = "${_publishdir}/nf_output"
 
-// A lot of useful modules are already implemented and added to the nextflow modules, you can import them to use
-// the publishdir is a key word that we're using around all our modules to control where the output files will be saved
-include {summaryLibrary} from "$MODULES_FOLDER/nf_library_search_modules.nf" addParams(publishdir: _publishdir)
-
 process processDataPython {
     /* This is a sample process that runs a python script.
 
@@ -41,14 +37,14 @@ process processDataPython {
     conda "$TOOL_FOLDER/conda_env.yml"
 
     input:
-    file input 
+    val x 
 
     output:
-    file 'python_output.tsv'
+    file 'output_gnps_library'
 
     script:
     """
-    python $TOOL_FOLDER/python_script.py --input_filename $input --output_filename python_output.tsv
+    python $TOOL_FOLDER/process_gnps_libraries.py output_gnps_library
     """
 }
 
@@ -73,13 +69,10 @@ workflow Main{
     input_map
 
     main:
-    libraries_ch = Channel.fromPath(input_map.input_spectra + "/*.mgf" )
-    // summaryLibrary(libraries_ch)
-    library_summary_ch = summaryLibrary(libraries_ch)
-    processDataPython(library_summary_ch)
+    val_ch = 0
+    processDataPython(val_ch)
 
     emit:
-    library_summary_ch // doesn't need .out as it is already the output of summaryLibrary, assigned to library_summary_ch
     py_out = processDataPython.out
 }
 
