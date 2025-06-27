@@ -1,0 +1,13 @@
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9.16
+  - rdkit=2023.03.1
+  - pandas=1.5.3
+  - numpy=1.24.3
+  - pip:
+    - xmltodict
+    - requests
+    - pyteomics
+    - tqdm

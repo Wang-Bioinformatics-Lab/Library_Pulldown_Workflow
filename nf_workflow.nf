@@ -23,7 +23,7 @@ else{
 // Augmenting with nf_output
 _publishdir = "${_publishdir}/nf_output"
 
-process processDataPython {
+process determineGNPSLibraries {
     /* This is a sample process that runs a python script.
 
     For each process, you can specify the publishDir, which is the directory where the output files will be saved.
@@ -40,12 +40,37 @@ process processDataPython {
     val x 
 
     output:
-    file 'output_gnps_library'
+    file 'library_summaries'
 
     script:
     """
-    mkdir -p output_gnps_library
-    python $TOOL_FOLDER/process_gnps_libraries.py output_gnps_library
+    mkdir -p library_summaries
+    python $TOOL_FOLDER/process_gnps_libraries.py library_summaries
+    """
+}
+
+process formatGNPSLibraries {
+    /* This is a sample process that formats the GNPS libraries.
+
+    The input and output blocks define the input and output files for the process.
+    The script block contains the command that will be run in the process.
+    */
+
+    publishDir "$_publishdir", mode: 'copy'
+
+    conda "$TOOL_FOLDER/conda_rdkit.yml"
+
+    input:
+    file "input/*"
+
+    output:
+    file '*.json'
+    file '*.MSP'
+    file '*.MGF'
+
+    script:
+    """
+    python $TOOL_FOLDER/format_gnps_libraries.py $input formatted_libraries.json
     """
 }
 
@@ -71,10 +96,12 @@ workflow Main{
 
     main:
     val_ch = 0
-    processDataPython(val_ch)
+    gnpslibrary_summary_json_ch = determineGNPSLibraries(val_ch)
+
+    // Now we will do stuff
 
     emit:
-    py_out = processDataPython.out
+    py_out = determineGNPSLibraries.out
 }
 
 workflow {

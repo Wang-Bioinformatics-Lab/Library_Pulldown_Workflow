@@ -5,6 +5,10 @@ import requests
 import random
 import json
 
+# debugging
+import requests_cache
+requests_cache.install_cache('gnps_cache')
+
 def get_gnps_library_entries(library_name):
     url = "https://gnps.ucsd.edu/ProteoSAFe/LibraryServlet?library={}".format(library_name)
 
@@ -36,10 +40,6 @@ def main():
     
     # shuffle order
     #shuffled = random.shuffle(all_gnps_libraries)
-    
-
-
-    library_entries = []
 
     for library in all_gnps_libraries:
         print(library)
@@ -50,13 +50,6 @@ def main():
         # saving it out
         output_file = f"{args.output_folder}/{library_name}.json"
         open(output_file, 'w').write(json.dumps(entries, indent=2))
-
-        for entry in entries:
-            entry['library'] = library_name
-            library_entries.append(entry)
-
-    # now we can go and request the entries
-
 
 
 if __name__ == "__main__":
