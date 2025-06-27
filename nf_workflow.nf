@@ -1,9 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-// 
-params.input_spectra = "$baseDir/data/"
-
 //This publish dir is mostly  useful when we want to import modules in other workflows, keep it here usually don't change it
 params.publishdir = "$launchDir"
 TOOL_FOLDER = "$moduleDir/bin"
@@ -36,11 +33,13 @@ process determineGNPSLibraries {
 
     conda "$TOOL_FOLDER/conda_env.yml"
 
+    maxForks 4
+
     input:
     val x 
 
     output:
-    file 'library_summaries'
+    file 'library_summaries/*'
 
     script:
     """
@@ -65,12 +64,12 @@ process formatGNPSLibraries {
 
     output:
     file '*.json'
-    file '*.MSP'
-    file '*.MGF'
+    file '*.msp'
+    file '*.mgf'
 
     script:
     """
-    python $TOOL_FOLDER/format_gnps_libraries.py $input formatted_libraries.json
+    python $TOOL_FOLDER/format_gnps_libraries.py input/* . 
     """
 }
 
@@ -98,7 +97,8 @@ workflow Main{
     val_ch = 0
     gnpslibrary_summary_json_ch = determineGNPSLibraries(val_ch)
 
-    // Now we will do stuff
+    // Now we will do some formatting
+    formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
 
     emit:
     py_out = determineGNPSLibraries.out
@@ -108,10 +108,6 @@ workflow {
     /* 
     The input map is created to reduce the dependency of the other workflows to the `params`
     */
-    input_map = [
-        input_spectra: params.input_spectra
-    ]
+    input_map = []
     out = Main(input_map)
-    out[0].view() // library_summary_ch
-    out.py_out.view()
 }

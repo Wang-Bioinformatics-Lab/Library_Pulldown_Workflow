@@ -1,9 +1,11 @@
+import os
 import sys
 import argparse
 import pandas as pd
 import requests
 import random
 import json
+
 
 try:
     from rdkit import Chem
@@ -12,8 +14,11 @@ except:
     pass
 
 # debugging
-import requests_cache
-requests_cache.install_cache('gnps_cache')
+try:
+    import requests_cache
+    requests_cache.install_cache('gnps_cache')
+except:
+    pass
     
 def get_inchikey(smiles, inchi):
     inchikey_from_smiles = ""
@@ -129,7 +134,10 @@ def gnps_library_enrich_peaks(all_GNPS_list):
             # We first try to get it locally
             spectrum_peaks_url = "{}/gnpsspectrum?SpectrumID={}".format(api_url, spectrum["spectrum_id"])
             r = requests.get(spectrum_peaks_url)
+            print(r.status_code, spectrum_peaks_url)
+            
             spectrum_json = r.json()
+
             new_spectrum["peaks_json"] = spectrum_json["spectruminfo"]["peaks_json"]
             new_spectrum["annotation_history"] = spectrum_json["annotations"]
             output_list.append(new_spectrum)
@@ -203,9 +211,9 @@ def json_to_mgf(json_spectrum):
     mgf_string += "PUBMED=" + json_spectrum["Pubmed_ID"] + "\n"
     mgf_string += "SUBMITUSER=" + json_spectrum["submit_user"] + "\n"
     
-    
     mgf_string += "LIBRARYQUALITY=" + json_spectrum["Library_Class"] + "\n"
     mgf_string += "SPECTRUMID=" + json_spectrum["SpectrumID"] + "\n"
+    mgf_string += "USI=mzspec:GNPS:{}:accession:{}\n".format(json_spectrum["library_membership"], json_spectrum["SpectrumID"])
     mgf_string += "SCANS=" + json_spectrum["scan"] + "\n"
     
     peaks_json = json_spectrum["peaks_json"]
@@ -228,8 +236,6 @@ def json_to_msp(json_spectrum):
     if int(json_spectrum["Library_Class"]) > 3:
         #print("CHALLENGE OR UNKNOWN CLASS, SKIPPING: " + json_spectrum["Library_Class"] + "\t" + json_spectrum["SpectrumID"])
         return ""
-
-    
 
     # Determine inchikey
     inchi_key = json_spectrum["InChIKey_inchi"]
@@ -286,11 +292,19 @@ def main():
     # loading the json file
     spectra_json = json.loads(open(args.input_json, 'r').read())
 
+    print(len(spectra_json["spectra"]), "spectra loaded from", args.input_json)
+
     # enriching with structures and formula
     spectra_list = gnps_library_enrich_structures(spectra_json["spectra"])
 
+    print(len(spectra_list), "spectra enriched with structures and formulas")
+
     # enriching with peaks
     spectra_list = gnps_library_enrich_peaks(spectra_list)
+
+    print(len(spectra_list), "spectra enriched with peaks")
+
+    
 
     # we'll need to save
     _output_library_files(spectra_list, args.output_folder, os.path.basename(args.input_json).replace(".json", ""))
