@@ -3,6 +3,7 @@ import argparse
 import pandas as pd
 import requests
 import random
+import json
 
 def get_gnps_library_entries(library_name):
     url = "https://gnps.ucsd.edu/ProteoSAFe/LibraryServlet?library={}".format(library_name)
@@ -34,7 +35,7 @@ def main():
     all_gnps_libraries = get_all_gnps_libraries()
     
     # shuffle order
-    shuffled = random.shuffle(all_gnps_libraries)
+    #shuffled = random.shuffle(all_gnps_libraries)
     
 
 
@@ -45,8 +46,16 @@ def main():
         library_name = library['library']
         print(f"Processing library: {library_name}")
         entries = get_gnps_library_entries(library_name)
-        # for entry in entries:
-        #     entry['library'] = library_name
+
+        # saving it out
+        output_file = f"{args.output_folder}/{library_name}.json"
+        open(output_file, 'w').write(json.dumps(entries, indent=2))
+
+        for entry in entries:
+            entry['library'] = library_name
+            library_entries.append(entry)
+
+    # now we can go and request the entries
 
 
 

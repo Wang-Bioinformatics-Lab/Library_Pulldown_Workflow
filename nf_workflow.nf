@@ -44,6 +44,7 @@ process processDataPython {
 
     script:
     """
+    mkdir -p output_gnps_library
     python $TOOL_FOLDER/process_gnps_libraries.py output_gnps_library
     """
 }
