@@ -73,6 +73,25 @@ process formatGNPSLibraries {
     """
 }
 
+process createAggregrateGNPSLibraries {
+    publishDir "$_publishdir", mode: 'copy'
+
+    conda "$TOOL_FOLDER/conda_env.yml"
+
+    input:
+    file "input/*"
+
+    output:
+    file '*.json'
+    file '*.msp'
+    file '*.mgf'
+
+    script:
+    """
+    python $TOOL_FOLDER/create_aggregate_gnps_libraries.py input .
+    """
+}
+
 workflow Main{
     // -------  -------
     /* 
@@ -98,7 +117,10 @@ workflow Main{
     gnpslibrary_summary_json_ch = determineGNPSLibraries(val_ch)
 
     // Now we will do some formatting
-    formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
+    gnps_library_formats_ch = formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
+
+    // lets aggregate
+    // createAggregrateGNPSLibraries(gnpslibrary_summary_json_ch.collect())
 
     emit:
     py_out = determineGNPSLibraries.out
