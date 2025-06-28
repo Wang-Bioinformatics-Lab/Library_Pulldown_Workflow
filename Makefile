@@ -1,6 +1,9 @@
 run:
 	nextflow run ./nf_workflow.nf -resume -c nextflow.config
 
+run_no_cache:
+	nextflow run ./nf_workflow.nf -c nextflow.config
+
 run_importer_workflow:
 	nextflow run ./nf_workflow_importer.nf -resume -c nextflow.config
 
