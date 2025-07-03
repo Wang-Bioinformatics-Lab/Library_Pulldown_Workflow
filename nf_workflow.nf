@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 
 //This publish dir is mostly  useful when we want to import modules in other workflows, keep it here usually don't change it
-params.publishdir = "$launchDir"
+params.publishdir = "$launchDir/output"
 TOOL_FOLDER = "$moduleDir/bin"
 MODULES_FOLDER = "$TOOL_FOLDER/NextflowModules"
 
@@ -18,7 +18,7 @@ else{
 }
 
 // Augmenting with nf_output
-_publishdir = "${_publishdir}/nf_output"
+_publishdir = "${_publishdir}"
 
 process determineGNPSLibraries {
     /* This is a sample process that runs a python script.

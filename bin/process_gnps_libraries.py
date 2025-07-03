@@ -6,8 +6,8 @@ import random
 import json
 
 # debugging
-import requests_cache
-requests_cache.install_cache('gnps_cache')
+#import requests_cache
+#requests_cache.install_cache('gnps_cache')
 
 def get_gnps_library_entries(library_name):
     url = "https://gnps.ucsd.edu/ProteoSAFe/LibraryServlet?library={}".format(library_name)
