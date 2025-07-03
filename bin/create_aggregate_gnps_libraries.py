@@ -1,0 +1,88 @@
+import argparse
+import os
+import json
+
+from process_gnps_libraries import get_all_gnps_libraries
+
+def main():
+    parser = argparse.ArgumentParser(description='Test write out a file.')
+    parser.add_argument('input_folder')
+    parser.add_argument('output_folder')
+
+    args = parser.parse_args()
+
+    # lets get the libraries from the api 
+    gnps_libraries_list = get_all_gnps_libraries()
+
+    NON_PROPOGATED_TYPE = ["GNPS", "IMPORT"]
+    PROPOGATED_TYPE = ["GNPS-PROPOGATED"]
+
+    output_mgf_propogated = open(os.path.join(args.output_folder, "gnps_propagated.mgf"), "w")
+    output_msp_propogated = open(os.path.join(args.output_folder, "gnps_propagated.msp"), "w")
+    output_mgf_non_propogated = open(os.path.join(args.output_folder, "gnps_non_propagated.mgf"), "w")
+    output_msp_non_propogated = open(os.path.join(args.output_folder, "gnps_non_propagated.msp"), "w")
+
+    # for us to write the JSON file
+    non_propogated_spectra_list = []
+    propogated_spectra_list = []
+
+    for library in gnps_libraries_list:
+        # reading the json
+        input_library_json = json.load(open(os.path.join(args.input_folder, f"{library['library']}.json")))
+
+        print(library, len(input_library_json))
+
+        if library['type'] in NON_PROPOGATED_TYPE:
+            print ("Writing Non Propogated Library")
+
+            for spectrum in input_library_json:
+                non_propogated_spectra_list.append(spectrum)
+                propogated_spectra_list.append(spectrum)
+
+            # lets append the MGF file to the merged one
+            with open(os.path.join(args.input_folder, f"{library['library']}.mgf"), "r") as mgf_file:
+                for line in mgf_file:
+                    output_mgf_non_propogated.write(line)
+                    output_mgf_propogated.write(line)                    
+                
+                output_mgf_non_propogated.write("\n\n")
+                output_mgf_propogated.write("\n\n")
+
+            # lets append the MSP file to the merged one
+            with open(os.path.join(args.input_folder, f"{library['library']}.msp"), "r") as msp_file:
+                for line in msp_file:
+                    output_msp_non_propogated.write(line)
+                    output_msp_propogated.write(line)
+                
+                output_msp_non_propogated.write("\n\n")
+                output_msp_propogated.write("\n\n")
+        
+        elif library['type'] in PROPOGATED_TYPE:
+            for spectrum in input_library_json:
+                propogated_spectra_list.append(spectrum)
+
+            # lets append the MGF file to the merged one
+            with open(os.path.join(args.input_folder, f"{library['library']}.mgf"), "r") as mgf_file:
+                for line in mgf_file:
+                    output_mgf_propogated.write(line)                    
+                
+                output_mgf_propogated.write("\n\n")
+
+            # lets append the MSP file to the merged one
+            with open(os.path.join(args.input_folder, f"{library['library']}.msp"), "r") as msp_file:
+                for line in msp_file:
+                    output_msp_propogated.write(line)
+                
+                output_msp_propogated.write("\n\n")
+
+
+    # writing out the json file
+    with open(os.path.join(args.output_folder, "gnps_propagated.json"), "w") as propogated_json_file:
+        json.dump(propogated_spectra_list, propogated_json_file, indent=4)
+
+    with open(os.path.join(args.output_folder, "gnps_non_propagated.json"), "w") as non_propogated_json_file:
+        json.dump(non_propogated_spectra_list, non_propogated_json_file, indent=4)
+
+
+if __name__ == "__main__":
+    main()

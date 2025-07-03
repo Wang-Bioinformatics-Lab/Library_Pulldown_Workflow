@@ -80,6 +80,8 @@ process createAggregrateGNPSLibraries {
 
     input:
     file "input/*"
+    file "input/*"
+    file "input/*"
 
     output:
     file '*.json'
@@ -117,10 +119,10 @@ workflow Main{
     gnpslibrary_summary_json_ch = determineGNPSLibraries(val_ch)
 
     // Now we will do some formatting
-    gnps_library_formats_ch = formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
+    (gnps_library_formats_json_ch, gnps_library_formats_msp_ch, gnps_library_formats_mgf_ch) = formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
 
     // lets aggregate
-    // createAggregrateGNPSLibraries(gnpslibrary_summary_json_ch.collect())
+    createAggregrateGNPSLibraries(gnps_library_formats_json_ch.collect(), gnps_library_formats_msp_ch.collect(), gnps_library_formats_mgf_ch.collect())
 
     emit:
     py_out = determineGNPSLibraries.out
