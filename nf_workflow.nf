@@ -57,17 +57,15 @@ process formatGNPSLibraries {
 
     conda "$TOOL_FOLDER/conda_rdkit.yml"
 
-    errorStrategy 'ignore'
-
     maxForks 4
 
     input:
     file "input/*"
 
     output:
-    file '*.json'
-    file '*.msp'
-    file '*.mgf'
+    file '*.json' optional true
+    file '*.msp' optional true
+    file '*.mgf' optional true
 
     script:
     """
