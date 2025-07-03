@@ -33,8 +33,6 @@ process determineGNPSLibraries {
 
     conda "$TOOL_FOLDER/conda_env.yml"
 
-    maxForks 4
-
     input:
     val x 
 
@@ -58,6 +56,10 @@ process formatGNPSLibraries {
     publishDir "$_publishdir", mode: 'copy'
 
     conda "$TOOL_FOLDER/conda_rdkit.yml"
+
+    errorStrategy 'ignore'
+
+    maxForks 4
 
     input:
     file "input/*"
