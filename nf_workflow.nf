@@ -3,6 +3,8 @@ nextflow.enable.dsl=2
 
 //This publish dir is mostly  useful when we want to import modules in other workflows, keep it here usually don't change it
 params.publishdir = "$launchDir/output"
+params.cachelibrariesdir = "$launchDir/output/library_summaries"
+
 TOOL_FOLDER = "$moduleDir/bin"
 MODULES_FOLDER = "$TOOL_FOLDER/NextflowModules"
 
@@ -35,14 +37,19 @@ process determineGNPSLibraries {
 
     input:
     val x 
+    file "cached_library_summaries"
 
     output:
     file 'library_summaries/*'
+    file 'library_overal_summary.csv'
 
     script:
     """
     mkdir -p library_summaries
-    python $TOOL_FOLDER/process_gnps_libraries.py library_summaries
+    python $TOOL_FOLDER/process_gnps_libraries.py \
+    cached_library_summaries \
+    library_summaries \
+    library_overal_summary.csv
     """
 }
 
@@ -116,7 +123,8 @@ workflow Main{
 
     main:
     val_ch = 0
-    gnpslibrary_summary_json_ch = determineGNPSLibraries(val_ch)
+    cached_library_summaries_ch = channel.fromPath("${params.cachelibrariesdir}")
+    (gnpslibrary_summary_json_ch,_) = determineGNPSLibraries(val_ch, cached_library_summaries_ch)
 
     // Now we will do some formatting
     (gnps_library_formats_json_ch, gnps_library_formats_msp_ch, gnps_library_formats_mgf_ch) = formatGNPSLibraries(gnpslibrary_summary_json_ch.flatten())
@@ -124,8 +132,6 @@ workflow Main{
     // lets aggregate
     createAggregrateGNPSLibraries(gnps_library_formats_json_ch.collect(), gnps_library_formats_msp_ch.collect(), gnps_library_formats_mgf_ch.collect())
 
-    emit:
-    py_out = determineGNPSLibraries.out
 }
 
 workflow {
