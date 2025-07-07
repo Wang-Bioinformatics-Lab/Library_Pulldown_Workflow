@@ -14,11 +14,11 @@ except:
     pass
 
 # debugging
-try:
-    import requests_cache
-    requests_cache.install_cache('gnps_cache')
-except:
-    pass
+# try:
+#     import requests_cache
+#     requests_cache.install_cache('gnps_cache')
+# except:
+#     pass
     
 def get_inchikey(smiles, inchi):
     inchikey_from_smiles = ""
@@ -122,9 +122,11 @@ def gnps_library_enrich_peaks(all_GNPS_list):
 
     try:
         # checking the heartbeat
-        r = requests.get(api_url + "heartbeat")
+        r = requests.get("{}/heartbeat".format(api_url))
         r.raise_for_status()  # Raise an error for bad responses
     except:
+        # WE SHOUDL DISABLE THIS FOR OUTSDIE OF SERVER
+        raise Exception("Could not connect to the GNPS peaks API at {}. Please check the URL.".format(api_url))
         api_url = "https://external.gnps2.org/"
 
     output_list = []

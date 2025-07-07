@@ -66,6 +66,9 @@ process formatGNPSLibraries {
 
     maxForks 4
 
+    errorStrategy 'retry'
+    maxRetries 10
+
     input:
     file "input/*"
 

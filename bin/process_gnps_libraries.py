@@ -60,6 +60,9 @@ def main():
         output_filename = f"{args.output_summaries_folder}/{library_name}.json"
 
         try:
+            # DEBUGGING
+            raise Exception("Forcing error to test cache handling")
+        
             entries = get_gnps_library_entries(library_name)
             
             # saving it out
