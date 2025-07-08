@@ -61,7 +61,7 @@ def main():
 
         try:
             # DEBUGGING
-            raise Exception("Forcing error to test cache handling")
+            #raise Exception("Forcing error to test cache handling")
         
             entries = get_gnps_library_entries(library_name)
             
