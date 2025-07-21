@@ -99,6 +99,8 @@ process createAggregrateGNPSLibraries {
     file '*.mgf'
     file "ALL_GNPS_SPLITS.mgf.tar.gz"
     file "ALL_GNPS_SPLITS.msp.tar.gz"
+    file "ALL_GNPS_NO_PROPOGATED_SPLITS.mgf.tar.gz"
+    file "ALL_GNPS_NO_PROPOGATED_SPLITS.msp.tar.gz"
 
     script:
     """
