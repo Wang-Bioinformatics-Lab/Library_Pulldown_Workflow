@@ -42,6 +42,9 @@ def main():
 
     all_gnps_libraries = get_all_gnps_libraries()
 
+    # DEBUG filtering to only GNPS-SUSPECTLIST	
+    # all_gnps_libraries = [lib for lib in all_gnps_libraries if lib['library'] == 'GNPS-SUSPECTLIST']
+
     output_summary_list = []
     
     # shuffle order
