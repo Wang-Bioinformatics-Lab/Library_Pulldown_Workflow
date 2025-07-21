@@ -234,8 +234,8 @@ def json_to_mgf(json_spectrum):
 
 #output libraries into MSDial usable msp
 def json_to_msp(json_spectrum):
-    #print(json_spectrum["SpectrumID"])
-    if int(json_spectrum["Library_Class"]) > 3:
+    
+    if int(json_spectrum["Library_Class"]) > 4:
         #print("CHALLENGE OR UNKNOWN CLASS, SKIPPING: " + json_spectrum["Library_Class"] + "\t" + json_spectrum["SpectrumID"])
         return ""
 
@@ -295,6 +295,9 @@ def main():
     spectra_json = json.loads(open(args.input_json, 'r').read())
 
     print(len(spectra_json["spectra"]), "spectra loaded from", args.input_json)
+
+    # DEBUG Filtering to only 100 MS/MS spectra first ones
+    # spectra_json["spectra"] = spectra_json["spectra"][:100]
 
     # enriching with structures and formula
     spectra_list = gnps_library_enrich_structures(spectra_json["spectra"])
