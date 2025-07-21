@@ -97,10 +97,18 @@ process createAggregrateGNPSLibraries {
     file '*.json'
     file '*.msp'
     file '*.mgf'
+    file "ALL_GNPS_SPLITS.mgf.tar.gz"
+    file "ALL_GNPS_SPLITS.msp.tar.gz"
 
     script:
     """
     python $TOOL_FOLDER/create_aggregate_gnps_libraries.py input .
+
+    tar -czf ALL_GNPS_NO_PROPOGATED_SPLITS.mgf.tar.gz ALL_GNPS_NO_PROPOGATED_SPLIT_*.mgf
+    tar -czf ALL_GNPS_NO_PROPOGATED_SPLITS.msp.tar.gz ALL_GNPS_NO_PROPOGATED_SPLIT_*.msp
+
+    tar -czf ALL_GNPS_SPLITS.mgf.tar.gz ALL_GNPS_SPLIT_*.mgf
+    tar -czf ALL_GNPS_SPLITS.msp.tar.gz ALL_GNPS_SPLIT_*.msp
     """
 }
 
