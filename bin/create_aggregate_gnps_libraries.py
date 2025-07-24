@@ -24,14 +24,14 @@ def main():
 
     output_split_file_count = 1
     output_split_spectra_count = 0
-    output_split_mgf_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_SPLIT_{}.mgf".format(output_slit_mgf_file_count)), "w")
+    output_split_mgf_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_SPLIT_{}.mgf".format(output_split_file_count)), "w")
     output_split_msp_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_SPLIT_{}.msp".format(output_split_file_count)), "w")
 
     # non propogated split
     output_split_non_propogated_file_count = 1
     output_split_non_propogated_spectra_count = 0
-    output_split_mgf_non_propogated_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_NO_PROPOGATED_SPLIT_{}.mgf".format(output_split_mgf_non_propogated_file_count)), "w")
-    output_split_msp_non_propogated_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_NO_PROPOGATED_SPLIT_{}.msp".format(output_split_file_count)), "w")
+    output_split_mgf_non_propogated_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_NO_PROPOGATED_SPLIT_{}.mgf".format(output_split_non_propogated_file_count)), "w")
+    output_split_msp_non_propogated_all_file = open(os.path.join(args.output_folder, "ALL_GNPS_NO_PROPOGATED_SPLIT_{}.msp".format(output_split_non_propogated_file_count)), "w")
 
     # for us to write the JSON file
     non_propogated_spectra_list = []
