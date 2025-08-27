@@ -5,6 +5,8 @@ import pandas as pd
 import requests
 import random
 import json
+import copy
+from tqdm import tqdm
 
 
 try:
@@ -28,6 +30,8 @@ def get_inchikey(smiles, inchi):
             inchikey_from_smiles = str(Chem.MolToInchiKey(Chem.MolFromSmiles(smiles)))
         else:
             inchikey_from_smiles = ""
+    except KeyboardInterrupt:
+        raise
     except:
         inchikey_from_smiles = ""
 
@@ -36,6 +40,8 @@ def get_inchikey(smiles, inchi):
             inchikey_from_inchi = str(Chem.InchiToInchiKey(inchi))
         else:
             inchikey_from_inchi = ""
+    except KeyboardInterrupt:
+        raise
     except:
         inchikey_from_inchi = ""
 
@@ -58,6 +64,8 @@ def get_formula(smiles, inchi):
             formula_from_smiles = str(CalcMolFormula(Chem.MolFromSmiles(smiles)))
         else:
             formula_from_smiles = ""
+    except KeyboardInterrupt:
+        raise
     except:
         formula_from_smiles = ""
 
@@ -66,6 +74,8 @@ def get_formula(smiles, inchi):
             formula_from_inchi = str(CalcMolFormula(Chem.MolFromInchi(inchi)))
         else:
             formula_from_inchi = ""
+    except KeyboardInterrupt:
+        raise
     except:
         formula_from_inchi = ""
 
@@ -82,7 +92,8 @@ def get_formula(smiles, inchi):
 
 # Enriching GNPS Library data with structures and formulas
 def gnps_library_enrich_structures(all_GNPS_list):
-    from tqdm import tqdm
+    # DEBUG get first 1000
+    # all_GNPS_list = all_GNPS_list[:1000]
 
     all_spectra = []
     for spectrum in tqdm(all_GNPS_list):
@@ -115,8 +126,6 @@ def gnps_library_enrich_structures(all_GNPS_list):
 
 # Getting all the spectrum peaks for the library spectrum
 def gnps_library_enrich_peaks(all_GNPS_list):
-    import copy
-    from tqdm import tqdm
 
     api_url = "http://externalstructureproxy-web:5000/"
 
@@ -126,8 +135,9 @@ def gnps_library_enrich_peaks(all_GNPS_list):
         r.raise_for_status()  # Raise an error for bad responses
     except:
         # WE SHOUDL DISABLE THIS FOR OUTSDIE OF SERVER
-        raise Exception("Could not connect to the GNPS peaks API at {}. Please check the URL.".format(api_url))
         api_url = "https://external.gnps2.org/"
+        #raise Exception("Could not connect to the GNPS peaks API at {}. Please check the URL.".format(api_url))
+        
 
     output_list = []
     for spectrum in tqdm(all_GNPS_list):
@@ -136,7 +146,8 @@ def gnps_library_enrich_peaks(all_GNPS_list):
             # We first try to get it locally
             spectrum_peaks_url = "{}/gnpsspectrum?SpectrumID={}".format(api_url, spectrum["spectrum_id"])
             r = requests.get(spectrum_peaks_url)
-            print(r.status_code, spectrum_peaks_url)
+            r.raise_for_status()
+            #print(r.status_code, spectrum_peaks_url)
             
             spectrum_json = r.json()
 
@@ -147,6 +158,7 @@ def gnps_library_enrich_peaks(all_GNPS_list):
         except KeyboardInterrupt:
             raise
         except:
+            print("ERROR", spectrum["spectrum_id"])
             continue
 
     return output_list
@@ -294,7 +306,7 @@ def main():
     # loading the json file
     spectra_json = json.loads(open(args.input_json, 'r').read())
 
-    print(len(spectra_json["spectra"]), "spectra loaded from", args.input_json)
+    print("ZZZZZZZZZZZZ", len(spectra_json["spectra"]), "spectra loaded from", args.input_json)
 
     # DEBUG Filtering to only 100 MS/MS spectra first ones
     # spectra_json["spectra"] = spectra_json["spectra"][:100]
