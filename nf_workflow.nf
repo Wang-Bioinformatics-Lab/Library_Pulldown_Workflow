@@ -64,7 +64,7 @@ process formatGNPSLibraries {
 
     conda "$TOOL_FOLDER/conda_rdkit.yml"
 
-    maxForks 4
+    maxForks 1
 
     errorStrategy 'retry'
     maxRetries 10
